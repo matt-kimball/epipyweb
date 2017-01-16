@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WSGI_FILE=epipyweb_uwsgi.py
+WSGI_FILE=serve/epipyweb_uwsgi.py
 
 UWSGI_SOCKET_FLAGS="--socket /tmp/epipyweb.sock --uid www-data --gid www-data"
 UWSGI_DAEMON_FLAGS="--daemonize /tmp/epipyweb.log"

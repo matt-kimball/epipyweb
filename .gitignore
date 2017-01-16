@@ -1,1 +1,3 @@
-*.db
+test.log
+dns.db
+__pycache__
