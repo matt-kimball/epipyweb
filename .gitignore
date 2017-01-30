@@ -1,3 +1,4 @@
 test.log
 dns.db
 __pycache__
+dns.db.*

@@ -1,0 +1,11 @@
+[Unit]
+Description=Socket for Epipyweb
+
+[Socket]
+ListenStream=/var/run/epipyweb/uwsgi.sock
+SocketUser=www-data
+SocketGroup=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

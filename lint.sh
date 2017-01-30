@@ -5,4 +5,4 @@ PY_SOURCE=$(find . -name '*.py')
 
 jslint --terse $JS_SOURCE
 pep8 $PY_SOURCE
-mypy --silent-imports $PY_SOURCE
+mypy --ignore-missing-imports $PY_SOURCE
