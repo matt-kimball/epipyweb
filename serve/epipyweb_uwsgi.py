@@ -1,12 +1,17 @@
+import contextlib
 import json
+import os
 import re
+import socket
 import sqlite3
 import urllib.parse
+import uwsgi
 
 from typing import *
 
 
 DATABASE_PATH = '/var/lib/epipyweb/dns.db'
+EPIPYNET_SOCKET_PATH = '/var/run/epipynet/epipynet.sock'
 
 
 StartResponseHeaders = Iterable[Tuple[str, str]]
@@ -22,8 +27,7 @@ def groupqueries_page(
 
     'Retrieve a page of DNS queries associated with a group ID.'
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         cursor.execute(
             'SELECT id, value, time FROM dnsquery' +
             ' WHERE group_id = ?' +
@@ -42,8 +46,6 @@ def groupqueries_page(
             })
 
         return result
-    finally:
-        cursor.close()
 
 
 def dnsquerygroup_page_sql(
@@ -121,8 +123,7 @@ def check_neighbor_pages_present(
         else:
             next_page_present = True
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         if before_id is not None:
             (sql, sql_args, _) = dnsquerygroup_page_sql(
                 search_value, None, before_id, 1)
@@ -136,8 +137,6 @@ def check_neighbor_pages_present(
             cursor.execute(sql, sql_args)
             if cursor.fetchone():
                 next_page_present = True
-    finally:
-        cursor.close()
 
     return (previous_page_present, next_page_present)
 
@@ -155,15 +154,12 @@ def dnsquerygroup_page(
     if count > 100:
         count = 100
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         (sql, sql_args, reverse) = dnsquerygroup_page_sql(
             search_value, before_id, after_id, count + 1)
 
         cursor.execute(sql, sql_args)
         rows = cursor.fetchall()
-    finally:
-        cursor.close()
 
     result = cast(Dict, {
         'groups': [],
@@ -213,10 +209,8 @@ def groupqueries(
     connection group.'''
 
     count = 100
-    try:
+    with contextlib.suppress(KeyError, ValueError):
         count = int(query['count'][0])
-    except (KeyError, ValueError):
-        pass
 
     group_id = None
     try:
@@ -224,11 +218,8 @@ def groupqueries(
     except (KeyError, ValueError):
         return {'error': 'missing group id'}
 
-    db = sqlite3.connect(DATABASE_PATH)
-    try:
+    with contextlib.closing(sqlite3.connect(DATABASE_PATH)) as db:
         return groupqueries_page(db, group_id, count)
-    finally:
-        db.close()
 
 
 def dnsquerygroup(
@@ -237,22 +228,16 @@ def dnsquerygroup(
     'Retrieve a batch of DNS query log entries'
 
     count = 100
-    try:
+    with contextlib.suppress(KeyError, ValueError):
         count = int(query['count'][0])
-    except (KeyError, ValueError):
-        pass
 
     before_id = None
-    try:
+    with contextlib.suppress(KeyError, ValueError):
         before_id = int(query['before'][0])
-    except (KeyError, ValueError):
-        pass
 
     after_id = None
-    try:
+    with contextlib.suppress(KeyError, ValueError):
         after_id = int(query['after'][0])
-    except (KeyError, ValueError):
-        pass
 
     search_value = None
     try:
@@ -262,12 +247,46 @@ def dnsquerygroup(
     except KeyError:
         pass
 
-    db = sqlite3.connect(DATABASE_PATH)
-    try:
+    with contextlib.closing(sqlite3.connect(DATABASE_PATH)) as db:
         return dnsquerygroup_page(
             db, search_value, before_id, after_id, count)
-    finally:
-        db.close()
+
+
+def get_disk_status() -> Dict:
+
+    'Collect disk usage statistics'
+
+    log_size = os.stat(DATABASE_PATH).st_size
+    statvfs = os.statvfs(DATABASE_PATH)
+    space_free = statvfs.f_bavail * statvfs.f_frsize
+
+    return {
+        'log_size': log_size,
+        'space_free': space_free
+    }
+
+
+def status() -> Generator[bytes, None, Dict]:
+
+    'Get the epipynet daemon status through its Unix socket'
+
+    with contextlib.closing(socket.socket(
+            socket.AF_UNIX, socket.SOCK_STREAM)) as sock:
+
+        sock.connect(EPIPYNET_SOCKET_PATH)
+
+        sock.send(b'status\n')
+        recv_buff = b''
+        while b'\n' not in recv_buff:
+            uwsgi.wait_fd_read(sock.fileno())
+            yield b''
+
+            recv_buff += sock.recv(4096)
+
+        return {
+            'network': json.loads(recv_buff.decode('utf-8')),
+            'disk': get_disk_status()
+        }
 
 
 def start_ok(
@@ -297,5 +316,9 @@ def application(
     elif request == 'groupqueries':
         start_ok(start_response)
         yield json.dumps(groupqueries(query)).encode('utf-8')
+    elif request == 'status':
+        start_ok(start_response)
+        status_obj = yield from status()
+        yield json.dumps(status_obj).encode('utf-8')
     else:
         start_response('404 Not Found', [('Context-Type', 'text/plain')])

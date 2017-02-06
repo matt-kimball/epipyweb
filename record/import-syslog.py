@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import contextlib
 import datetime
 import os
 import re
@@ -51,8 +52,7 @@ def main() -> None:
 
     args = parse_cmdline()
 
-    db = epipydb.open_database()
-    try:
+    with contextlib.closing(epipydb.open_database()) as db:
         success = True
         for log in args.logfiles:
             try:
@@ -65,8 +65,6 @@ def main() -> None:
 
         if not success:
             sys.exit(1)
-    finally:
-        db.close()
 
 
 if __name__ == '__main__':

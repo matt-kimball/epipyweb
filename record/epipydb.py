@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import re
 import os
@@ -67,8 +68,7 @@ def is_value_already_in_query_group(
     '''Returns true if the query value is used by one of the
     DNS queries in the given query group'''
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         cursor.execute(
             'SELECT id FROM dnsquery' +
             ' WHERE group_id = ? AND value = ?' +
@@ -76,8 +76,6 @@ def is_value_already_in_query_group(
             (group_id, query_value))
 
         return cursor.fetchone() is not None
-    finally:
-        cursor.close()
 
 
 def is_query_in_group(
@@ -117,8 +115,7 @@ def log_dns_query_group(
     '''Find the query group which a new query belongs to, or create
     a new group for the query'''
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         cursor.execute(
             'SELECT id, start_time, end_time, query_count' +
             ' FROM querygroup' +
@@ -145,8 +142,6 @@ def log_dns_query_group(
             (querytime_iso, querytime_iso, queryhost))
         group_id = cursor.lastrowid
         return group_id
-    finally:
-        cursor.close()
 
 
 def find_hostname_from_ip(
@@ -157,8 +152,7 @@ def find_hostname_from_ip(
     '''Search the DHCP assignments for a hostname corresponding to
     an IP address at a specific time'''
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         cursor.execute(
             'SELECT hostname FROM dhcpassignment' +
             ' WHERE ip_address = ? AND time <= ?' +
@@ -171,8 +165,6 @@ def find_hostname_from_ip(
             return row[0]
         else:
             return ip_address
-    finally:
-        cursor.close()
 
 
 def log_dns_query(
@@ -186,8 +178,7 @@ def log_dns_query(
 
     isotime = syslog_time_to_datetime(querytime).isoformat()
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         hostname = find_hostname_from_ip(db, isotime, address)
         group_id = log_dns_query_group(db, isotime, queryvalue, hostname)
 
@@ -219,8 +210,6 @@ def log_dns_query(
                 'INSERT INTO querydomain (query_id, group_id, time, domain)' +
                 ' VALUES (?,?,?,?)',
                 querydomain)
-    finally:
-        cursor.close()
 
 
 def log_dhcp_assignment(
@@ -234,15 +223,12 @@ def log_dhcp_assignment(
 
     isotime = syslog_time_to_datetime(time).isoformat()
 
-    cursor = db.cursor()
-    try:
+    with contextlib.closing(db.cursor()) as cursor:
         cursor.execute(
             'INSERT INTO dhcpassignment' +
             ' (ip_address, mac_address, hostname, time)' +
             ' VALUES (?,?,?,?)',
             (ip_address, mac_address, hostname, isotime))
-    finally:
-        cursor.close()
 
 
 def log_line(
@@ -314,10 +300,8 @@ def open_database() -> sqlite3.Connection:
     '''Ensure the database and its tables exist, open it, and
     return a connection'''
 
-    try:
+    with contextlib.suppress(FileExistsError):
         os.mkdir(os.path.dirname(DATABASE_PATH))
-    except FileExistsError:
-        pass
 
     db = sqlite3.connect(DATABASE_PATH)
 

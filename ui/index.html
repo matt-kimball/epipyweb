@@ -2,34 +2,98 @@
 <html>
 
 <head>
-    <title>Epipylon - Recent connections</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=9">
-    <meta name="viewport" content="initial-scale=1">
-
-    <link rel="stylesheet" href="epipyweb.css">
-    <link rel="shortcut icon" href="favicon.ico">
+    <title>Epipylon - Status</title>
+    <!--# include file="head.html" -->
 </head>
 
 <body>
-    <div id="title-bar">
-        <a href="/">
-            <img id="epipylon-logo" src="epipylon.png">
-        </a>
-        <div id="title-separator"></div>
-        <div id="search-bar">
-            <div id="search-button-div">
-                <img id="search-button" src="search_button.png">
+    <script>
+        active_tab = "#status-tab";
+    </script>
+
+    <!--# include file="title-bar.html" -->
+
+    <div id="body-content">
+        <div id="status-outer">
+            <div id="checking-status">
+                Checking device status
             </div>
-            <div id="search-input-div">
-                <input id="search-input" type="text">
+            <div id="dhcp-interference">
+                A DHCP server other than Epipylon is active on your network.
+                This will interfere with Epipylon tracking connections made
+                by devices on your network.
+                <p>
+                It is likely that your modem or router is the device acting as
+                a DHCP server.
+                <p>
+                Configure this <a id="dhcp-device-link">this device</a> 
+                (<span class="dhcp-address-value" id="dhcp-device-address">
+                    dhcp device address
+                </span>) to disable DHCP.
+            </div>
+            <div class="hidden-text" id="normal-operation">
+                <h2>Status</h2>
+                Epipylon is operating normally.
             </div>
         </div>
+        <div class="hidden-text" id="network-addresses-text">
+            <h2>Network Addresses</h2>
+            <p>
+            Write down the following information and keep it in a safe place:
+            <div class="report-outer" id="network-addresses-outer">
+                <p>
+                <div class="report-inner" id="network-addresses">
+                    Router:
+                    <span class="report-value" id="router-address">
+                        (router address)
+                    </span>
+                    <br>
+                    Subnet Mask:
+                    <span class="report-value" id="subnet-mask">
+                        (subnet mask)
+                    </span>
+                    <br>
+                    DNS Servers:
+                    <span class="report-value" id="dns-addresses">
+                        (DNS addresses)
+                    </span>
+                    <br>
+                    Epipylon Address:
+                    <span class="report-value" id="device-address">
+                        (device address)
+                    </span>
+                </div>
+            </div>
+            <p>
+            You may need the above addresses to connect to your router
+            if there is an unexpected problem with your
+            Epipylon hardware.
+        </div>
+        <div class="hidden-text" id="disk-space-text">
+            <p>
+            <h2>SD Card Storage</h2>
+        </div>
+        <div class="report-outer" id="disk-space-outer">
+            <p>
+            <div class="report-inner" id="disk-space">
+                Connection Log Size:
+                <span class="report-value" id="log-size">
+                    (log size)
+                </span>
+                <br>
+                Space Free:
+                <span class="report-value" id="space-free">
+                    (space free)
+                </span>
+            </div>
+        </div>
+        <br>
     </div>
-    <div id="connections"></div>
-    <div id="page-links"></div>
 
-    <script type="text/javascript" src="jquery-1.12.4.min.js"></script>
-    <script type="text/javascript" src="epipyweb.js"></script>
+    <script type="text/javascript" src="status.js"></script>
+    <script>
+        check_status();
+    </script>
 </body>
 
 </html>

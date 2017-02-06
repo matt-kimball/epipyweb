@@ -1,7 +1,12 @@
+html {
+    height: 100%;
+}
+
 body {
     font-family: sans-serif;
     font-size: 18px;
     margin: 0px;
+    height: 100%;
 }
 
 img {
@@ -13,8 +18,6 @@ img {
     padding-left: 10%;
     padding-right: 10%;
     padding-top: 20px;
-    padding-bottom: 20px;
-    margin-bottom: 50px;
     background-color: black;
 }
 
@@ -44,6 +47,84 @@ img {
 
 #search-button {
     cursor: pointer;    
+}
+
+#page-tab-bar {
+    padding-top: 20px;
+    height: 40px;
+}
+
+.page-tab {
+    float: left;
+    background-color: #6969ff;
+    height: 20px;
+    font-size: 18px;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    margin-right: 20px;
+}
+
+.page-link {
+    color: black;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#tab-bar {
+    height: 20px;
+    margin-bottom: 30px;
+    background-color: gold;
+}
+
+#body-content {
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+#status-outer {
+    display: flex;
+}
+
+#checking-status {
+    padding: 20px;
+    background-color: gold;
+}
+
+#dhcp-interference {
+    display: none;
+    padding: 20px;
+    background-color: red;
+}
+
+.dhcp-address-value {
+    font-size: 16px;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.hidden-text {
+    display: none;
+}
+
+.report-outer {
+    display: flex;
+}
+
+.report-inner {
+    font-size: 16px;
+    display: none;
+    background-color: gold;
+    padding: 20px;
+}
+
+.report-value {
+    font-size: 14px;
+    font-family: monospace;
+    font-weight: bold;
+    padding-left: 10px;
 }
 
 #connections {

@@ -1,0 +1,37 @@
+<div id="title-bar">
+    <a href="/">
+        <img id="epipylon-logo" src="epipylon.png">
+    </a>
+    <div id="title-separator"></div>
+    <div id="search-bar">
+        <div id="search-button-div">
+            <img id="search-button" src="search_button.png">
+        </div>
+        <div id="search-input-div">
+            <input id="search-input" type="text">
+        </div>
+        <div id="page-tab-bar">
+            <div class="page-tab" id="status-tab">
+                <a class="page-link" href="/">
+                    Status
+                </a>
+            </div>
+            <div class="page-tab" id="connections-tab">
+                <a class="page-link" href="/connections.html">
+                    Connections
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="tab-bar"></div>
+
+<script type="text/javascript" src="jquery-1.12.4.min.js"></script>
+<script>
+    $(active_tab).css("background-color", "gold");
+</script>
+
+<script type="text/javascript" src="epipyweb.js"></script>
+<script>
+    attach_ui_events();
+</script>

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import contextlib
 import os
 import sys
 import syslog
@@ -40,13 +41,10 @@ def handle_log_line(
 
     'Commit a single log line to the database'
 
-    db = epipydb.open_database()
-    try:
+    with contextlib.closing(epipydb.open_database()) as db:
         if not test_lock_held():
             epipydb.log_line(db, line)
             db.commit()
-    finally:
-        db.close()
 
 
 def main() -> None:
