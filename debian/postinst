@@ -1,0 +1,12 @@
+#!/bin/sh
+
+systemctl enable epipyweb.socket
+systemctl enable epipyweb.service
+
+systemctl restart epipyweb.socket
+systemctl restart epipyweb.service
+
+ln -sf /etc/nginx/sites-available/epipyweb /etc/nginx/sites-enabled/epipyweb
+rm -f /etc/nginx/sites-enabled/default
+
+systemctl try-restart nginx

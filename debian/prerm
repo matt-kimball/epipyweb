@@ -1,0 +1,11 @@
+#!/bin/sh
+
+systemctl stop epipyweb.socket
+systemctl stop epipyweb.service
+
+systemctl disable epipyweb.socket
+systemctl disable epipyweb.service
+
+rm -f /etc/nginx/sites-enabled/epipyweb
+
+systemctl try-restart nginx

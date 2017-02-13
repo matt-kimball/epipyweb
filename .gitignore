@@ -2,3 +2,5 @@ test.log
 dns.db
 __pycache__
 dns.db.*
+epipyweb_*
+

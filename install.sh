@@ -12,7 +12,7 @@ chown www-data.www-data $RUN_EPI
 
 cp -r record serve ui uwsgi.sh $SHARE_EPI
 
-cp -r etc/nginx etc/rsyslog.d etc/systemd etc/uwsgi /etc
+cp -r etc/nginx etc/rsyslog.d etc/uwsgi /etc
 
 ln -sf /etc/nginx/sites-available/epipyweb /etc/nginx/sites-enabled/epipyweb
 rm -f /etc/nginx/sites-enabled/default
