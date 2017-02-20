@@ -60,6 +60,52 @@ function append_highlighted_value(
 }
 
 
+/*  Convert an integer to a string with leading zeros  */
+function zero_pad(
+    value,
+    digits
+) {
+    var str;
+
+    str = String(value);
+    while (str.length < digits) {
+        str = '0' + str;
+    }
+
+    return str;
+}
+
+
+/*  Convert a UTC time string to a display string in the local timezone  */
+function format_local_time(
+    utc_time
+) {
+    var now,
+        date,
+        utc_time_regex,
+        regex_match;
+
+    now = new Date();
+    utc_time_regex = /([0-9]+)-([0-9]+)-([0-9]+)T([0-9]+):([0-9]+):([0-9]+)/;
+    regex_match = utc_time.match(utc_time_regex);
+    date = new Date(
+        regex_match[1],
+        regex_match[2],
+        regex_match[3],
+        regex_match[4],
+        regex_match[5] - now.getTimezoneOffset(),
+        regex_match[6]
+    );
+
+    return String(date.getFullYear()) +
+        '-' + zero_pad(date.getMonth(), 2) +
+        '-' + zero_pad(date.getDate(), 2) +
+        ' ' + zero_pad(date.getHours(), 2) +
+        ':' + zero_pad(date.getMinutes(), 2) +
+        ':' + zero_pad(date.getSeconds(), 2);
+}
+
+
 /*
     Create an object for managing retrieving additional connections
     in a connection group, either in response to a user clicking on 
@@ -115,7 +161,7 @@ function create_connection_retriever(
                 );
                 connection_div.append(value_div);
 
-                time = query.time.replace('T', ' ');
+                time = format_local_time(query.time);
                 connection_div.append($("<div>", {
                     "class": "additional-connection-time"
                 }).text(time));
@@ -319,7 +365,7 @@ function fill_connections(
 
         time = group.time;
         if (time !== undefined) {
-            time = time.replace('T', ' ');
+            time = format_local_time(time);
         }
 
         append_connection_row(

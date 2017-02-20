@@ -15,7 +15,7 @@ function display_status(
         $("#dhcp-interference").css("display", "block");
         $("#dhcp-device-address").text(status.network.dhcp_server);
 
-        device_url = "http://" + status.dhcp_server + "/";
+        device_url = "http://" + status.network.dhcp_server + "/";
         $("#dhcp-device-link").attr("href", device_url);
     } else {
         $("#normal-operation").css("display", "block");
