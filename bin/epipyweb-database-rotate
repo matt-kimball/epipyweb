@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+import contextlib
+import datetime
+import sqlite3
+
+
+DATABASE_PATH = '/var/lib/epipyweb/dns.db'
+
+
+def discard_before(
+        db: sqlite3.Connection,
+        discard_time: datetime.datetime) -> None:
+
+    'Discard all database entries prior to a particular time'
+
+    discard_iso = discard_time.isoformat()
+    print('Discarding prior to {}'.format(discard_iso))
+
+    with contextlib.closing(db.cursor()) as cursor:
+        cursor.execute(
+            'DELETE FROM querygroup WHERE start_time < ?',
+            (discard_iso,))
+        cursor.execute(
+            'DELETE FROM dnsquery WHERE time < ?',
+            (discard_iso,))
+        cursor.execute(
+            'DELETE FROM querydomain WHERE time < ?',
+            (discard_iso,))
+        cursor.execute(
+            'DELETE FROM dhcpassignment WHERE time < ?',
+            (discard_iso,))
+
+    db.commit()
+
+
+def main():
+
+    'Discard everything from the database prior to a month ago'
+
+    now = datetime.datetime.now()
+    one_month = datetime.timedelta(days=30)
+    discard_time = now - one_month
+
+    with contextlib.closing(sqlite3.connect(DATABASE_PATH)) as db:
+        discard_before(db, discard_time)
+
+
+if __name__ == '__main__':
+    main()

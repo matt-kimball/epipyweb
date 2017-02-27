@@ -6,6 +6,9 @@ systemctl stop epipyweb.service
 systemctl disable epipyweb.socket
 systemctl disable epipyweb.service
 
+systemctl stop epipyweb-database-rotate.timer
+systemctl disable epipyweb-database-rotate.timer
+
 rm -f /etc/nginx/sites-enabled/epipyweb
 
 systemctl try-restart nginx

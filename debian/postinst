@@ -6,6 +6,9 @@ systemctl enable epipyweb.service
 systemctl restart epipyweb.socket
 systemctl restart epipyweb.service
 
+systemctl enable epipyweb-database-rotate.timer
+systemctl start epipyweb-database-rotate.timer
+
 ln -sf /etc/nginx/sites-available/epipyweb /etc/nginx/sites-enabled/epipyweb
 rm -f /etc/nginx/sites-enabled/default
 

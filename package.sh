@@ -4,9 +4,14 @@ TIMESTAMP=$(date +%Y%m%d%H%M%S)
 VERSION=0.1
 PACKAGE=epipyweb_$VERSION-$TIMESTAMP
 
+BINS="\
+    bin/epipyweb-database-rotate"
+
 SYSTEMD="\
     systemd/epipyweb.service \
-    systemd/epipyweb.socket"
+    systemd/epipyweb.socket \
+    systemd/epipyweb-database-rotate.service \
+    systemd/epipyweb-database-rotate.timer"
 
 DEBIAN="\
     debian/postinst \
@@ -30,6 +35,9 @@ CONTROL_END
 
 chmod a+rx $DEBIAN
 cp $DEBIAN $PACKAGE/DEBIAN
+
+mkdir -p $PACKAGE/usr/sbin
+cp $BINS $PACKAGE/usr/sbin
 
 mkdir -p $PACKAGE/usr/share/epipyweb
 cp -r record serve ui uwsgi.sh $PACKAGE/usr/share/epipyweb

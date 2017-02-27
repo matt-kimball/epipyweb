@@ -1,0 +1,11 @@
+[Unit]
+Description=Rotate Epipyweb database
+
+[Timer]
+OnBootSec=30min
+OnUnitActiveSec=1day
+AccuracySec=10min
+Unit=epipyweb-database-rotate.service
+
+[Install]
+WantedBy=multi-user.target

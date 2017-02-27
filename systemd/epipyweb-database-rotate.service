@@ -1,0 +1,7 @@
+[Unit]
+Description=Rotate Epipyweb database
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/epipyweb-database-rotate
+StandardError=syslog
